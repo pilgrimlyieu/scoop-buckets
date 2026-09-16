@@ -1,0 +1,61 @@
+{
+    "version": "0.13.0-1651.567264883",
+    "description": "Vim fork focused on extensibility and usability",
+    "homepage": "https://neovim.io",
+    "license": {
+        "identifier": "Apache-2.0,Vim",
+        "url": "https://github.com/neovim/neovim/blob/master/LICENSE.txt"
+    },
+    "suggest": {
+        "vcredist": "extras/vcredist2022"
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip",
+            "hash": "aad4feb70dc080048df9bf98e77f846226996ed70ae482e849712e56d4e673fa",
+            "extract_dir": "nvim-win64"
+        },
+        "arm64": {
+            "url": "https://github.com/neovim/neovim/releases/download/nightly/nvim-win-arm64.zip",
+            "hash": "42d375fe92905f72d495bb6e4bc12c52a3d643b94dc49f277e68aa7800e58ac4",
+            "extract_dir": "nvim-win-arm64"
+        }
+    },
+    "bin": [
+        "bin\\nvim.exe",
+        "bin\\xxd.exe",
+        "bin\\win32yank.exe"
+    ],
+    "checkver": {
+        "url": "https://api.github.com/repos/neovim/neovim/releases/tags/nightly",
+        "script": [
+            "$release = $page | ConvertFrom-Json",
+            "$x64 = @($release.assets | Where-Object { $_.name -ceq 'nvim-win64.zip' -and $_.state -eq 'uploaded' })",
+            "$arm = @($release.assets | Where-Object { $_.name -ceq 'nvim-win-arm64.zip' -and $_.state -eq 'uploaded' })",
+            "if ($release.draft -or $release.tag_name -cne 'nightly' -or $x64.Count -ne 1 -or $arm.Count -ne 1) { throw 'Windows nightly assets are unavailable.' }",
+            "if ($release.body -notmatch 'NVIM v(?<base>[\\d.]+)-dev-(?<count>\\d+)') { throw 'Unknown Neovim development version.' }",
+            "$build = [Math]::Max([long]$x64[0].id, [long]$arm[0].id)",
+            "\"$($Matches.base)-$($Matches.count).$build|nightly|$($x64[0].id)|$($arm[0].id)\""
+        ],
+        "regex": "^(?<version>[\\d.]+-\\d+\\.\\d+)\\|(?<tag>nightly)\\|(?<x64>\\d+)\\|(?<arm64>\\d+)$"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/neovim/neovim/releases/download/nightly/nvim-win64.zip",
+                "hash": {
+                    "url": "https://api.github.com/repos/neovim/neovim/releases/assets/$matchX64",
+                    "jsonpath": "$.digest"
+                }
+            },
+            "arm64": {
+                "url": "https://github.com/neovim/neovim/releases/download/nightly/nvim-win-arm64.zip",
+                "hash": {
+                    "url": "https://api.github.com/repos/neovim/neovim/releases/assets/$matchArm64",
+                    "jsonpath": "$.digest"
+                }
+            }
+        }
+    },
+    "##": "Based on ScoopInstaller/Versions neovim-nightly; exposes win32yank and xxd, and tracks rebuilt assets."
+}

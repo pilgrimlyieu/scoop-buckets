@@ -1,0 +1,53 @@
+name: Update manifests
+
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: 'Manifest name or * for all manifests'
+        default: '*'
+        type: string
+  schedule:
+    - cron: '17 * * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-manifests
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      APP_SELECTOR: ${{ inputs.app || '*' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - name: Update and verify manifests
+        shell: pwsh
+        run: .\bin\update.ps1 -App $env:APP_SELECTOR
+      - name: Commit verified updates
+        shell: pwsh
+        run: |
+          . .\scripts\Tools.ps1
+          git diff --quiet -- bucket
+          if ($LASTEXITCODE -eq 0) {
+            Write-BucketStatus 'No manifest changes to publish.' -Level PASS
+            exit 0
+          }
+          if ($LASTEXITCODE -ne 1) { throw 'Unable to inspect manifest changes.' }
+          Write-BucketStatus (Get-Content .local/update-message.txt -Raw -Encoding UTF8).Trim() -Level UPDATE
+          git config --local user.name 'github-actions[bot]'
+          git config --local user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- bucket
+          git commit --file .local/update-message.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to commit manifests.' }
+          git push
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to push manifests.' }
+          Write-BucketStatus 'Verified manifest updates published.' -Level PASS

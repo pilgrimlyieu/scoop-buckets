@@ -1,0 +1,42 @@
+{
+    "version": "0.4.1",
+    "description": "A cross-platform break reminder app",
+    "homepage": "https://github.com/pilgrimlyieu/Focust",
+    "license": {
+        "identifier": "GPL-3.0",
+        "url": "https://github.com/pilgrimlyieu/Focust/blob/main/LICENSE"
+    },
+    "notes": [
+        "Requires the Microsoft Edge WebView2 Runtime.",
+        "Configuration remains in %APPDATA%\\com.fesmoph.focust. Update this copy with Scoop."
+    ],
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/pilgrimlyieu/Focust/releases/download/v0.4.1/focust_0.4.1_windows_portable.zip",
+            "hash": "2e3b8fd8328462254f519cec09e994edff6652bd7ff17a26f16d310cf0fa627d"
+        }
+    },
+    "bin": "focust.exe",
+    "shortcuts": [
+        [
+            "focust.exe",
+            "Focust"
+        ]
+    ],
+    "checkver": {
+        "url": "https://api.github.com/repos/pilgrimlyieu/Focust/releases/latest",
+        "script": [
+            "$release = $page | ConvertFrom-Json",
+            "if ($release.draft -or $release.prerelease -or $release.tag_name -notmatch '^v(?<version>\\d+\\.\\d+\\.\\d+)$') { throw 'Expected a stable version tag.' }",
+            "\"$($Matches.version)|$($release.tag_name)\""
+        ],
+        "regex": "^(?<version>[\\d.]+)\\|(?<tag>v[\\d.]+)$"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/pilgrimlyieu/Focust/releases/download/$matchTag/focust_$version_windows_portable.zip"
+            }
+        }
+    }
+}

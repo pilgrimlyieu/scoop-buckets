@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  powershell:
+    name: PowerShell 5.1 checks
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validate with Windows PowerShell
+        shell: powershell
+        run: .\bin\test.ps1
+
+  pwsh:
+    name: PowerShell 7 checks
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validate with PowerShell 7
+        shell: pwsh
+        run: .\bin\test.ps1
+
+  packages:
+    name: Package integration
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check x64 packages and Scoop integration
+        shell: pwsh
+        run: .\bin\test-packages.ps1
+      - name: Check ARM64 archive contents
+        shell: pwsh
+        run: .\bin\test-packages.ps1 -App 'neovim*' -Architecture arm64 -ArchiveOnly

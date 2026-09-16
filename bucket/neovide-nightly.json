@@ -1,0 +1,48 @@
+{
+    "version": "20260906.051856.546771829",
+    "description": "A simple GUI for Neovim (nightly build)",
+    "homepage": "https://neovide.dev",
+    "license": "MIT",
+    "notes": "Requires Neovim 0.10 or newer. The version identifies the Windows nightly build.",
+    "suggest": {
+        "neovim": [
+            "neovim",
+            "neovim-nightly"
+        ]
+    },
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/neovide/neovide/releases/download/nightly/neovide-windows-x86_64.zip",
+            "hash": "f052ce0d1983c10727179a743cb407f6b0891b35e38229b25908c56829abef61"
+        }
+    },
+    "bin": "neovide.exe",
+    "shortcuts": [
+        [
+            "neovide.exe",
+            "Neovide Nightly"
+        ]
+    ],
+    "checkver": {
+        "url": "https://api.github.com/repos/neovide/neovide/releases/tags/nightly",
+        "script": [
+            "$release = $page | ConvertFrom-Json",
+            "$assets = @($release.assets | Where-Object name -CEQ 'neovide-windows-x86_64.zip')",
+            "if ($release.draft -or $release.tag_name -cne 'nightly' -or $assets.Count -ne 1 -or $assets[0].state -ne 'uploaded') { throw 'Windows nightly asset is unavailable.' }",
+            "$stamp = ([DateTimeOffset]$assets[0].updated_at).ToUniversalTime().ToString('yyyyMMdd.HHmmss')",
+            "\"$stamp.$($assets[0].id)|nightly\""
+        ],
+        "regex": "^(?<version>\\d{8}\\.\\d{6}\\.\\d+)\\|(?<tag>nightly)$"
+    },
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/neovide/neovide/releases/download/nightly/neovide-windows-x86_64.zip",
+                "hash": {
+                    "url": "https://api.github.com/repos/neovide/neovide/releases/assets/$patchVersion",
+                    "jsonpath": "$.digest"
+                }
+            }
+        }
+    }
+}
