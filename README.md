@@ -23,9 +23,11 @@ scoop install personal/focust
 | --- | --- | --- |
 | `anki-latest` | 有 Windows 包的最高可用版本，包含 alpha、beta、RC；数据放在 Scoop persist | x64 |
 | `neovide-nightly` | 官方 nightly ZIP；版本号包含 Windows 构建时间与资产 ID | x64 |
-| `focust` | 上游稳定版便携 ZIP，保留原有 AppData 配置位置 | x64 |
+| `focust` | 上游稳定版便携 ZIP，补齐 Windows 通知身份，保留原有 AppData 配置位置 | x64 |
 | `neovim` | 稳定版，提供 `nvim`、`xxd`、`win32yank` | x64、ARM64 |
 | `neovim-nightly` | nightly，提供同样的命令；构建 ID 可识别同一提交的重新打包 | x64、ARM64 |
+
+Focust 的安装钩子会给 Scoop 创建的快捷方式写入 Windows 通知所需的应用身份。普通 `scoop reset focust` 保存已有快捷方式时会保留该属性。如果已安装旧清单中的同版本，或快捷方式被删除后重建，更新 bucket 并退出 Focust 后执行 `scoop update focust --force`，重新应用安装钩子。
 
 ## 维护与验证
 
