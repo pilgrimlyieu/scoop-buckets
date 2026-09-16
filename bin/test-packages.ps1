@@ -108,6 +108,9 @@ try {
                 foreach ($shortcut in @($manifest.shortcuts)) {
                     if ($null -ne $shortcut -and !(Test-Path "$sandbox\shortcuts\$($shortcut[1]).lnk")) { throw "Shortcut creation failed for $app." }
                 }
+                if ($app -eq 'focust') {
+                    & "$PSScriptRoot\..\tests\FocustShortcuts.Tests.ps1" -Manifest $manifest -InstallDirectory $dir -VersionDirectory $original_dir -Architecture $Architecture
+                }
                 if ($app -like 'neovim*') {
                     $shimText = Get-Content "$scoopdir\shims\win32yank.shim" -Raw
                     if (!$shimText.Contains("$dir\bin\win32yank.exe")) { throw 'win32yank shim points to the wrong package.' }
