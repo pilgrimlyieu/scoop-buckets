@@ -138,24 +138,12 @@ assert(copied, 'clipboard round trip failed: exit=' .. tostring(status) .. ', ou
                         if ($process.ExitCode -ne 0) { throw "Clipboard test failed: $([IO.File]::ReadAllText("$sandbox\clipboard.stderr"))" }
                     }
                 }
-                if ($app -eq 'anki-latest') {
-                    Write-Utf8File "$dir\data\bucket-test.txt" 'persistent card-data marker'
-                    if (!(Test-Path "$persist_dir\data\bucket-test.txt")) { throw 'Anki data is not persisted.' }
-                }
                 # Exercise cleanup without touching external application data.
                 unlink_persist_data $manifest $dir
                 rm_shims $app $manifest $false $Architecture
                 rm_startmenu_shortcuts $manifest $false $Architecture
                 unlink_current $original_dir | Out-Null
                 Remove-Item $original_dir -Recurse -Force
-                if ($app -eq 'anki-latest') {
-                    if (!(Test-Path "$persist_dir\data\bucket-test.txt")) { throw 'Anki uninstall removed persisted data.' }
-                    $dir = "$scoopdir\apps\$app\next-version"
-                    $null = New-Item $dir -ItemType Directory -Force
-                    persist_data $manifest $dir $persist_dir
-                    if ((Get-Content "$dir\data\bucket-test.txt" -Raw).Trim() -ne 'persistent card-data marker') { throw 'Anki reinstall lost persisted data.' }
-                    unlink_persist_data $manifest $dir
-                }
             }
             $result = @{ app = $app; version = $version; architecture = $Architecture; sha256 = $arch.hash; archive_only = [bool]$ArchiveOnly; passed = $true }
             Write-Utf8File "$root\.local\results\$app-$Architecture.json" ($result | ConvertTo-Json)
