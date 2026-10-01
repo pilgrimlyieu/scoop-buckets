@@ -1,5 +1,5 @@
 {
-    "version": "0.4.1",
+    "version": "0.4.2",
     "description": "A cross-platform break reminder app",
     "homepage": "https://github.com/pilgrimlyieu/Focust",
     "license": {
@@ -12,8 +12,8 @@
     ],
     "architecture": {
         "64bit": {
-            "url": "https://github.com/pilgrimlyieu/Focust/releases/download/v0.4.1/focust_0.4.1_windows_portable.zip",
-            "hash": "2e3b8fd8328462254f519cec09e994edff6652bd7ff17a26f16d310cf0fa627d"
+            "url": "https://github.com/pilgrimlyieu/Focust/releases/download/v0.4.2/focust_0.4.2_windows_portable.zip",
+            "hash": "992a53c8ecf6a43d1528f4c33b706c2213628bd3299ae1ded3259bc08fceae9e"
         }
     },
     "bin": "focust.exe",
